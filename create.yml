@@ -1,0 +1,50 @@
+---
+- name: Create a test environment
+  hosts: localhost
+  tasks:
+    - name: create security group
+      os_security_group:
+        state: present
+        name: test_security_group
+        description: Security group for our test instances
+
+    - name: create security group rule for ping
+      os_security_group_rule:
+        security_group: test_security_group
+        protocol: icmp
+        remote_ip_prefix: 0.0.0.0/0
+
+    - name: create security group rule for SSH
+      os_security_group_rule:
+        security_group: test_security_group
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+        remote_ip_prefix: 0.0.0.0/0
+
+    - name: create VM
+      os_server:
+        state: present
+        name: test_instance
+        image: centos7-1907 
+        key_name: pk
+        timeout: 200
+        flavor: m1.small
+        network: default_network
+        auto_ip: yes
+        security_groups:
+          - test_security_group
+      register:
+        test_instance
+    
+    - name: Add VM to inventory
+      add_host:
+        name: test_instance
+        groups: test_vms
+        ansible_ssh_host: "{{ test_instance.server.public_v4 }}"
+    
+    - name: Wait for 2 min
+      wait_for:
+        timeout: 120
+      delegate_to: localhost
+

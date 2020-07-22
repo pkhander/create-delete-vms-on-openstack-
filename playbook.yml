@@ -1,0 +1,11 @@
+---
+
+## This calls for three playbook
+# create.yml - Creates an instance
+# checkssh.yml - Checks if ssh is possible in the v,
+# delete.yml - Destroys the instance and security group 
+
+
+- import_playbook : create.yml
+
+- import_playbook : checkssh.yml

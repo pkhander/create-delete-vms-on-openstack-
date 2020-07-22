@@ -1,0 +1,16 @@
+---
+- name: Delete test environment
+  hosts: localhost
+  gather_facts: false
+  tasks: 
+    - name: delete instance
+      os_server:
+        state: absent
+        name: test_instance
+        image: centos7-1907 
+        key_name: pk
+        
+    - name: Remove security group
+      os_security_group:
+        state: absent
+        name: test_security_group
